@@ -6,7 +6,7 @@ from logic import diff_tags
 
 DEBUG = os.environ.get('DEBUG') == 'true'
 
-DOWNLOADS_PATH = "/downloads"
+DOWNLOADS_PATH: str = os.environ.get('QBT_DOWNLOADS_PATH', '/downloads')
 INELIGIBLE_STATES = {
 	TorrentStates.QUEUED_DOWNLOAD,
 	TorrentStates.DOWNLOADING,
