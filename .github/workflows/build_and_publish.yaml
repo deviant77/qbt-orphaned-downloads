@@ -10,17 +10,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+      DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Generate Docker Hub meta
-        if: ${{ (secrets.DOCKER_HUB_USERNAME || '') != '' && (secrets.DOCKER_HUB_TOKEN || '') != '' }}
+        if: ${{ env.DOCKER_HUB_USERNAME != '' && env.DOCKER_HUB_TOKEN != '' }}
         id: docker_meta_dockerhub
         uses: crazy-max/ghaction-docker-meta@v1
         with:
           images: |
-            ${{ secrets.DOCKER_HUB_USERNAME }}/${{ github.repository }}
+            ${{ env.DOCKER_HUB_USERNAME }}/${{ github.repository }}
           tag-semver: |
             {{version}}
             {{major}}
@@ -38,17 +41,17 @@ jobs:
             {{major}}.{{minor}}
 
       - name: Login to Docker Hub
-        if: ${{ (secrets.DOCKER_HUB_USERNAME || '') != '' && (secrets.DOCKER_HUB_TOKEN || '') != '' }}
+        if: ${{ env.DOCKER_HUB_USERNAME != '' && env.DOCKER_HUB_TOKEN != '' }}
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          username: ${{ env.DOCKER_HUB_USERNAME }}
+          password: ${{ env.DOCKER_HUB_TOKEN }}
 
       - name: Login to GHCR
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
       - name: Build and push Docker Hub image
-        if: ${{ (secrets.DOCKER_HUB_USERNAME || '') != '' && (secrets.DOCKER_HUB_TOKEN || '') != '' }}
+        if: ${{ env.DOCKER_HUB_USERNAME != '' && env.DOCKER_HUB_TOKEN != '' }}
         uses: docker/build-push-action@v2
         with:
           push: true
