@@ -4,7 +4,8 @@ import time
 from qbittorrentapi import Client, TorrentStates
 from logic import diff_tags
 
-DEBUG = os.environ.get('DEBUG') == 'true'
+DEBUG = os.environ.get('DEBUG', '').lower() == 'true'
+DRY_RUN = os.environ.get('DRY_RUN', '').lower() == 'true'
 
 DOWNLOADS_PATH: str = os.environ.get('QBT_DOWNLOADS_PATH', '/downloads')
 INELIGIBLE_STATES = {
@@ -140,10 +141,11 @@ for torrent in client.torrents.info():
 			print('[{}]'.format(torrent.name), end=' ')
 		print(' '.join(delta))
 
-		if remove_tags:
-			torrent.remove_tags(remove_tags)
-		if add_tag:
-			torrent.add_tags(add_tag)
+		if not DRY_RUN:
+			if remove_tags:
+				torrent.remove_tags(remove_tags)
+			if add_tag:
+				torrent.add_tags(add_tag)
 
 if DEBUG:
 	print('---')
