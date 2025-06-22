@@ -19,6 +19,9 @@ INELIGIBLE_STATES = {
 
 SECONDS_IN_WEEK = 7 * 24 * 60 * 60
 
+if DRY_RUN:
+	print('Performing a dry run. No changes will be made to torrent tags.')
+
 if DEBUG:
 	print('Creating inode mappings...')
 
@@ -157,10 +160,10 @@ if deleted or unowned_paths:
 	if unowned_paths:
 		print('Found', len(unowned_paths), 'unowned files in download directory')
 
-if not os.path.exists('/data'):
-	os.mkdir('/data')
-with open('/data/unowned.txt.temp', 'w') as w:
+if not os.path.exists('/output'):
+	os.mkdir('/output')
+with open('/output/unowned.txt.temp', 'w') as w:
 	for unowned_path in sorted(unowned_paths):
 		w.write(unowned_path)
 		w.write('\n')
-os.rename('/data/unowned.txt.temp', '/data/unowned.txt')
+os.rename('/output/unowned.txt.temp', '/output/unowned.txt')
